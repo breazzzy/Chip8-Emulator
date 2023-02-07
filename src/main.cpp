@@ -2,13 +2,13 @@
 #include "chip8.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "SDL.h"
+#include "SDL2/SDL.h"
 
 #define SCALE 16
 #define WINDOW_HEIGHT 32
 #define WINDOW_WIDTH 64
 
-int main()
+int main(int argv, char** args)
 {
     Chip8 chip8 = Chip8();
     // std::cout << chip8.PC << std::endl;
@@ -33,7 +33,7 @@ int main()
 
     bool running = true;
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1 , SDL_RENDERER_ACCELERATED);
-    if (chip8.load("roms/maze.ch8"))
+    if (chip8.load("roms/octojam1title.ch8"))
     {
         // emulate
         std::cout << "----------------EMU START-----------------" << std::endl;
