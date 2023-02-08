@@ -17,8 +17,8 @@ private:
     unsigned short PC; // Program Counter
     unsigned short stack[16];
     unsigned char SP; // Stack Pointer
-    unsigned char display[SCREEN_WIDTH][SCREEN_HEIGHT];
-    unsigned char key;
+    unsigned short display[SCREEN_WIDTH][SCREEN_HEIGHT];
+    bool keypad[16];
 public:
 
     Chip8();
@@ -26,6 +26,9 @@ public:
     bool loadFont();
     int emulate();
     unsigned char getPixel(unsigned char x, unsigned char y);
-    void registerKey(unsigned char key);
+    void keyDown(unsigned int key);
+    void keyUp(unsigned int key);
+    void printRegisters();
+    void printInput();
     ~Chip8();
 };
