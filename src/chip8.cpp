@@ -158,7 +158,7 @@ void Chip8::printRegisters()
     }
     cout << "I: " << hex << (short)I << endl;
 }
-
+    
 void Chip8::printInput()
 {
     for (int i = 0; i < 16; i++)

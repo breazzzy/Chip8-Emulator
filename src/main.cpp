@@ -4,10 +4,16 @@
 #include <chrono>
 #include <stdio.h>
 #include "SDL2/SDL.h"
+#include <glad/glad.h>
+
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_opengl3.h"
 
 #define SCALE 16
 #define WINDOW_HEIGHT 32
 #define WINDOW_WIDTH 64
+#define CYCLE_DELAY 4
 
 const SDL_KeyCode keys[16] = {
     SDLK_x,
@@ -50,12 +56,22 @@ int main(int argv, char **args)
         fprintf(stderr, "could not initialize SDL: %s\n", SDL_GetError());
         return 1;
     }
-    int cycleDelay = 4;
 
     bool running = true;
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+
+    // setup Dear ImGui style
+    ImGui::StyleColorsDark();
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, gl_context);
+    // setup platform/renderer bindings
+    std::string glsl_version = "#version 130";
     if (chip8.load("roms/p.ch8"))
-    {
+    { // Rom loaded and read to emulate
         // emulate
         auto lastCycleTime = std::chrono::high_resolution_clock::now();
         std::cout << "----------------EMU START-----------------" << std::endl;
@@ -84,7 +100,8 @@ int main(int argv, char **args)
                     {
                         chip8.printInput();
                     }
-                    if( event.key.keysym.sym == SDLK_m){
+                    if (event.key.keysym.sym == SDLK_m)
+                    {
                         chip8.printRegisters();
                     }
                     for (int i = 0; i < 16; i++)
@@ -109,7 +126,7 @@ int main(int argv, char **args)
 
             auto currentTime = std::chrono::high_resolution_clock::now();
             float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
-            if (dt > cycleDelay && !paused)
+            if (dt > CYCLE_DELAY && !paused)
             {
                 lastCycleTime = currentTime;
                 if (chip8.emulate() != 0)
@@ -119,7 +136,7 @@ int main(int argv, char **args)
                 }
             }
 
-            // draw
+            // Draw SDL
             SDL_SetRenderDrawColor(renderer, 45, 40, 40, 255);
             SDL_RenderClear(renderer);
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -147,7 +164,6 @@ int main(int argv, char **args)
                 }
             }
             SDL_RenderPresent(renderer);
-            // SDL_Delay(5);
         }
     }
     else
