@@ -1,3 +1,0 @@
-/home/billy/Documents/proj/chip8/CMakeFiles/emu.dir
-/home/billy/Documents/proj/chip8/CMakeFiles/edit_cache.dir
-/home/billy/Documents/proj/chip8/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,0 @@
-/usr/bin/g++ -g -rdynamic CMakeFiles/emu.dir/src/main.o CMakeFiles/emu.dir/src/chip8.o -o emu  -L/usr/lib/x86_64-linux-gnu  -lSDL2 
