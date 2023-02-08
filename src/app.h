@@ -1,19 +1,36 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include "chip8.h"
 
-namespace App
+class Application
 {
-    class Application
-    {
-    public:
-        Application();
-        ~Application();
-        int run();
-        void stop();
+public:
+    Application();
+    ~Application();
+    int run();
+    void stop();
 
-    private:
-        int m_exit_status{0};
-        bool m_running { true };
-    };
-}
+private:
+    int m_exit_status{0};
+    bool m_running{true};
+    Chip8 chip8;
+    // const SDL_KeyCode keys[16] = {
+    //     SDLK_x,
+    //     SDLK_1,
+    //     SDLK_2,
+    //     SDLK_3,
+    //     SDLK_q,
+    //     SDLK_w,
+    //     SDLK_e,
+    //     SDLK_a,
+    //     SDLK_s,
+    //     SDLK_d,
+    //     SDLK_z,
+    //     SDLK_c,
+    //     SDLK_4,
+    //     SDLK_r,
+    //     SDLK_f,
+    //     SDLK_v,
+    // };
+};
