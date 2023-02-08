@@ -1,8 +1,8 @@
 # find_package(glfw3 3.3 REQUIRED)
 # find_package(OpenGL REQUIRED)
 # include_directories( ${OPENGL_INCLUDE_DIRS} )
-
-
+project(emu)
+cmake_minimum_required(VERSION 3.25)
 # add_executable(emu src/main.cpp src/chip8.cpp)
 
 # target_link_libraries(emu GL)
@@ -11,6 +11,7 @@
 # target_link_libraries(emu Xrandr)
 # target_link_libraries(emu pthread)
 # target_link_libraries(emu Xi)
+# set(CMAKE_CXX_COMPILER x86_64-w64-g++)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
