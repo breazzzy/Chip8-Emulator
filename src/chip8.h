@@ -8,17 +8,17 @@
 class Chip8
 {
 private:
-    bool FLAG_JMP;
-    unsigned char memory[MEMORY_SIZE];
-    unsigned char V[16];
-    unsigned short I;
-    unsigned char sound_timer;
-    unsigned char delay_timer;
-    unsigned short PC; // Program Counter
-    unsigned short stack[16];
-    unsigned char SP; // Stack Pointer
-    unsigned short display[SCREEN_WIDTH][SCREEN_HEIGHT];
-    bool keypad[16];
+    bool m_FLAG_JMP;
+    unsigned char m_memory[MEMORY_SIZE];
+    unsigned char m_registers[16];
+    unsigned short m_index;
+    unsigned char m_sound_timer;
+    unsigned char m_delay_timer;
+    unsigned short m_PC; // Program Counter
+    unsigned short m_stack[16];
+    unsigned char m_SP; // Stack Pointer
+    unsigned short m_display[SCREEN_WIDTH][SCREEN_HEIGHT];
+    bool m_keypad[16];
 public:
 
     Chip8();
@@ -30,5 +30,6 @@ public:
     void keyUp(unsigned int key);
     void printRegisters();
     void printInput();
+    bool playSound();
     ~Chip8();
 };

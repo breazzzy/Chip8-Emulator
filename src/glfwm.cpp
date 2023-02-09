@@ -18,7 +18,7 @@
 
 // int main(){
 //     Chip8 chip8 = Chip8();
-//     // std::cout << chip8.PC << std::endl;
+//     // std::cout << chip8.m_PC << std::endl;
 
 //     GLFWwindow* window;
 //     glfwSetErrorCallback(error_callback);

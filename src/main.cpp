@@ -1,8 +1,5 @@
-#include <iostream>
-#include <stdlib.h>
-#include <chrono>
-#include <stdio.h>
-// #include "SDL2/SDL.h"
+
+#include "SDL2/SDL.h"
 // #include <glad/glad.h>
 
 #include "app.cpp"
@@ -11,36 +8,71 @@
 // #include "../imgui/imgui_impl_sdl2.h"
 // #include "../imgui/imgui_impl_opengl3.h"
 
-#define SCALE 16
-#define WINDOW_HEIGHT 32
-#define WINDOW_WIDTH 64
-#define CYCLE_DELAY 4
 
-const SDL_KeyCode keys[16] = {
-    SDLK_x,
-    SDLK_1,
-    SDLK_2,
-    SDLK_3,
-    SDLK_q,
-    SDLK_w,
-    SDLK_e,
-    SDLK_a,
-    SDLK_s,
-    SDLK_d,
-    SDLK_z,
-    SDLK_c,
-    SDLK_4,
-    SDLK_r,
-    SDLK_f,
-    SDLK_v,
-};
 
 int main(int argv, char **args)
 {
     Application app = Application();
     app.run();
+
+    // SDL_Init(SDL_INIT_AUDIO);
+
+    // // the representation of our audio device in SDL:
+    // SDL_AudioDeviceID audio_device;
+
+    // int samplenr = 0;
+
+    // // opening an audio device:
+    // SDL_AudioSpec audio_spec;
+    // SDL_zero(audio_spec);
+    // audio_spec.freq = SAMPLE_RATE/2;
+    // audio_spec.format = AUDIO_S16SYS;
+    // audio_spec.channels = 1;
+    // audio_spec.samples = 2048;
+    // audio_spec.callback = audioCallback;
+    // audio_spec.userdata = &samplenr;
+
+    // audio_device = SDL_OpenAudioDevice(
+    //     NULL, 0, &audio_spec, NULL, 0);
+
+    // // pushing 3 seconds of samples to the audio buffer:
+    // // float x = 0;
+    // // for (int i = 0; i < audio_spec.freq * 3; i++)
+    // // {
+    // //     x += .010f;
+
+    // //     // SDL_QueueAudio expects a signed 16-bit value
+    // //     // note: "5000" here is just gain so that we will hear something
+    // //     int16_t sample = sin(x * 4) * 5000;
+
+    // //     const int sample_size = sizeof(int16_t) * 1;
+    // //     SDL_QueueAudio(audio_device, &sample, sample_size);
+    // // }
+
+    // // unpausing the audio device (starts playing):
+    // SDL_PauseAudioDevice(audio_device, 0);
+
+    // SDL_Delay(3000);
+
+    // SDL_PauseAudioDevice(audio_device, 1);
+    // // audio_spec.userdata = ;
+    // samplenr = 0;
+    // SDL_Delay(500);
+
+    // SDL_PauseAudioDevice(audio_device, 0);
+
+    // SDL_Delay(4000);
+
+
+    
+
+    // SDL_CloseAudioDevice(audio_device);
+    // SDL_Quit();
+
+    // return 0;
+
     // Chip8 chip8 = Chip8();
-    // // std::cout << chip8.PC << std::endl;
+    // // std::cout << chip8.m_PC << std::endl;
 
     // SDL_Window *window = NULL;
     // SDL_Surface *screen = NULL;
