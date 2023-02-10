@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include <deque>
 
 #include <SDL2/SDL.h>
 #include "chip8.h"
@@ -14,7 +16,9 @@ public:
 private:
     int m_exit_status{0};
     bool m_running{true};
+    bool m_debug{true};
     void m_handleInput(SDL_Event event);
+    // std::deque<std::string> m_last20Instructions;
     Chip8 m_chip8;
     const SDL_KeyCode m_keys[16] = {
         SDLK_x,

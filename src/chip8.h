@@ -18,16 +18,20 @@ private:
     unsigned short m_stack[16];
     unsigned char m_SP; // Stack Pointer
     unsigned short m_display[SCREEN_WIDTH][SCREEN_HEIGHT];
+    std::string m_last_instruction;
     bool m_keypad[16];
 public:
 
     Chip8();
+    bool isKey(unsigned int key);
     bool load(std::string path);
     bool loadFont();
     int emulate();
     unsigned char getPixel(unsigned char x, unsigned char y);
     void keyDown(unsigned int key);
     void keyUp(unsigned int key);
+    short getRegisterValue(int);
+    std::string lastInstruction();
     void printRegisters();
     void printInput();
     bool playSound();

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
 using namespace std;
 
 #define DEBUG false
@@ -64,6 +65,14 @@ Chip8::Chip8()
     }
 
     // std::cout << m_SP;
+}
+
+bool Chip8::isKey(unsigned int key){
+    return this->m_keypad[key];
+}
+
+std::string Chip8::lastInstruction(){
+    return this->m_last_instruction;
 }
 
 bool Chip8::load(std::string path)
@@ -146,6 +155,20 @@ void Chip8::keyUp(unsigned int key)
     this->m_keypad[key] = false;
 }
 
+short Chip8::getRegisterValue(int index){
+    if(index == 16)
+        return this->m_PC;
+    if(index == 17)
+        return this->m_index;
+    if(index == 18)
+        return this->m_SP;
+    if(index == 19)
+        return this->m_delay_timer;
+    if(index == 20)
+        return this->m_sound_timer;
+    return this->m_registers[index];
+}
+
 void Chip8::printRegisters()
 {
     for (int i = 0; i < 16; i++)
@@ -197,6 +220,9 @@ int Chip8::emulate()
     unsigned char n = (instruction & 0x000F);
 
     unsigned char byte = (instruction & 0x00FF); // byte also refered to as kk
+    std::stringstream s;
+    s << std::hex << instruction;
+    m_last_instruction = s.str();
     switch (opcode)
     {
     case 0x0000:

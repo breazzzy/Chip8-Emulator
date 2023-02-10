@@ -3,7 +3,6 @@
 #include <vector>
 #include <math.h>
 #include <chrono>
-#include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include "../lib/glad/include/glad/glad.h"
@@ -49,7 +48,7 @@ int Application::run()
         return -1;
     }
 
-    if (!m_chip8.load("rom/taudio.ch8"))
+    if (!m_chip8.load("rom/keypad.ch8"))
     {
         std::cout << "---ROM ERROR---" << std::endl;
         return 1;
@@ -65,7 +64,7 @@ int Application::run()
 
     // Create window with SDL_Renderer graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window *window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    SDL_Window *window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCALE * WINDOW_WIDTH + 100, SCALE * WINDOW_HEIGHT + 120, window_flags);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
     {
@@ -82,11 +81,13 @@ int Application::run()
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
+
+    io.Fonts->AddFontFromFileTTF("../fonts/Minecraft.ttf", 16);
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsClassic();
+    // ImGui::StyleColorsClassic();
     // ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
@@ -131,10 +132,21 @@ int Application::run()
     audio_device = SDL_OpenAudioDevice(
         NULL, 0, &audio_spec, NULL, 0);
 
+    // Define style
+    // ImGui::StyleColorsDark
+    ImGuiStyle *style = &ImGui::GetStyle();
+    style->Colors[ImGuiCol_FrameBg] = ImVec4(.3, .2, .2, 1.0);
+    style->Colors[ImGuiCol_WindowBg] = ImVec4(.3, .2, .2, 1.0);
+    // style->Colors[ImGuiCol_WindowBg] = ImVec4((45/255),(40/255),(40/255),1.0);
+    style->Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+    // style->Colors[ImGuiCol_Bg] = ImVec4((45/255),(40/255),(40/255),1.0);
+
     // Main loop
     bool done = false;
     bool paused = false;
     auto lastCycleTime = std::chrono::high_resolution_clock::now();
+
+    std::deque<std::string> m_last20Instructions;
 
     while (!done)
     {
@@ -159,11 +171,17 @@ int Application::run()
         auto currentTime = std::chrono::high_resolution_clock::now();
         float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
 
-        if (dt >= CYCLE_DELAY && !paused)
+        if (dt >= CYCLE_DELAY && !paused){
             lastCycleTime = currentTime;
-        if (m_chip8.emulate() != 0)
-            return 1;
-
+            if (m_chip8.emulate() != 0){
+                return 1;
+            }else{
+                m_last20Instructions.push_front(m_chip8.lastInstruction());
+                if(m_last20Instructions.size() > 20){
+                    m_last20Instructions.pop_back();
+                }
+            }
+        }
         // Start the Dear ImGui frame
         ImGui_ImplSDLRenderer_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -178,12 +196,11 @@ int Application::run()
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Hello, world!", NULL); // Create a window called "Hello, world!" and append into it.
 
             ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
-
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
 
@@ -196,6 +213,14 @@ int Application::run()
             ImGui::End();
         }
 
+        {
+            // ImGui::BeginMainMenuBar();
+            // bool sele = false;
+            // bool enab = true;
+            // // ImGui::MenuItem("item1", 'h', &sele, enab);
+            // ImGui::EndMainMenuBar();
+        }
+
         // 3. Show another simple window.
         if (show_another_window)
         {
@@ -206,11 +231,85 @@ int Application::run()
             ImGui::End();
         }
 
+        {
+            // ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0f, 0.6f, 0.6f,1.0f));
+            // ImGui::PushID(1);
+            if (this->m_debug)
+            {
+                //Insturction window
+                ImGui::SetNextWindowPos(ImVec2(SCALE * WINDOW_WIDTH, 0));
+                ImGui::SetNextWindowSize(ImVec2(100, SCALE * WINDOW_HEIGHT));
+                ImGui::Begin("Instrutions", NULL, ImGuiWindowFlags_NoMove);
+                for(int i = 0; i < m_last20Instructions.size(); i++){
+                    std::string s = m_last20Instructions[i];
+                    ImGui::Text(s.c_str());
+                }
+                ImGui::End();
+
+                ImGui::SetNextWindowPos(ImVec2(0, SCALE * WINDOW_HEIGHT + 1));
+                ImGui::SetNextWindowSize(ImVec2(SCALE * WINDOW_WIDTH + 100, 120));
+                ImGui::Begin("Registers", NULL, ImGuiWindowFlags_NoMove);
+                // ImGui::SetCursorPos();
+                if (ImGui::BeginTable("Registers", 9))
+                {
+                    // ImGui::TableSetupColumn("S",  ImGuiTableColumnFlags_NoResize);
+                    for (int row = 0; row < 4; row++)
+                    {
+                        ImGui::TableNextRow();
+                        for (int column = 0; column < 9; column++)
+                        {
+                            if (column < 4)
+                            {
+                                ImGui::TableSetColumnIndex(column);
+                                ImGui::Text("Register[%X]: %X", (row * 4) + column, (int)m_chip8.getRegisterValue((row * 4) + column));
+                            }
+                            else
+                            {
+                                if (column == 5)
+                                {
+                                    ImGui::TableSetColumnIndex(4);
+                                    if (row == 0)
+                                    {
+                                        ImGui::Text("PC: %X", (int)m_chip8.getRegisterValue(16));
+                                    }
+                                    if (row == 1)
+                                    {
+                                        ImGui::Text("Index: %X", (int)m_chip8.getRegisterValue(17));
+                                    }
+                                    if (row == 2)
+                                    {
+                                        ImGui::Text("SP: %X", (int)m_chip8.getRegisterValue(18));
+                                    }
+                                    if (row == 3)
+                                    {
+                                        ImGui::Text("Sound: %X", (int)m_chip8.getRegisterValue(20));
+                                    }
+                                }else if(column > 5){
+                                int key = 0;
+                                for (int j = 5; j < 9; j++)
+                                {
+                                    key++;
+                                    ImGui::TableSetColumnIndex(j);
+                                    ImGui::Text("Key: %X", (int)m_chip8.isKey(row * 4 + key));
+                                }}
+                            }
+                        }
+                    }
+                    ImGui::EndTable();
+                }
+                ImGui::End();
+                // ImGui::PopStyleColor();
+                // ImGui::PopID();
+                // Instruction
+                ImGui::SetNextWindowPos(ImVec2(0, SCALE * WINDOW_HEIGHT + 1));
+                ImGui::SetNextWindowSize(ImVec2(SCALE * WINDOW_WIDTH + 100, 120));
+            }
+        }
         // Audio
 
         if (m_chip8.playSound())
         {
-            std::cout << "PLAYING SOUND \a" << std::endl;
+            // std::cout << "PLAYING SOUND \a" << std::endl;
             SDL_PauseAudioDevice(audio_device, 0);
         }
         else
