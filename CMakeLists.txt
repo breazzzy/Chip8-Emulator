@@ -8,9 +8,9 @@ include(FetchContent)
 
 find_package(OpenGL REQUIRED)
 
-add_library("glad" "lib/glad/src/glad.c")
+# add_library("glad" "lib/glad/src/glad.c")
 
-include_directories("lib/glad/include")
+#include_directories("lib/glad/include")
 
 set(sources
     imgui/imconfig.h
@@ -38,4 +38,4 @@ include_directories(${SDL2_INCLUDE_DIRS})
 add_executable(emu src/main.cpp src/chip8.cpp ${sources})
 target_link_libraries(emu ${SDL2_LIBRARIES})
 
-target_link_libraries(emu "glad")
+#target_link_libraries(emu "glad")

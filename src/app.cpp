@@ -5,7 +5,7 @@
 #include <chrono>
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include "../lib/glad/include/glad/glad.h"
+// #include "../lib/glad/include/glad/glad.h"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl2.h"
