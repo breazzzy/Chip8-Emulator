@@ -2,7 +2,7 @@
 # find_package(OpenGL REQUIRED)
 # include_directories( ${OPENGL_INCLUDE_DIRS} )
 project(emu)
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.2)
 include(FetchContent)
 # add_executable(emu src/main.cpp src/chip8.cpp)
 

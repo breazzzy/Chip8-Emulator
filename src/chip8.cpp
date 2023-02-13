@@ -220,9 +220,10 @@ int Chip8::emulate()
     unsigned char n = (instruction & 0x000F);
 
     unsigned char byte = (instruction & 0x00FF); // byte also refered to as kk
-    std::stringstream s;
-    s << std::hex << instruction;
-    m_last_instruction = s.str();
+    std::stringstream instruction_hexstring;
+    instruction_hexstring << std::hex << (instruction & 0x0FFF);
+    // m_last_instruction = instruction_hexstring.str();
+    std::string operation = "abc   ";
     switch (opcode)
     {
     case 0x0000:
@@ -231,6 +232,7 @@ int Chip8::emulate()
         if (instruction == 0x00E0) // CLS
         {
             _debug("[_] CLS: 0x%X\n", instruction);
+            operation = "CLS";
             for (int x = 0; x < SCREEN_WIDTH; x++)
             {
                 for (int y = 0; y < SCREEN_HEIGHT; y++)
@@ -242,6 +244,7 @@ int Chip8::emulate()
         else if (instruction == 0x00EE) // RET
         {
             _debug("[_] RET: 0x%X\n", instruction);
+            operation = "RET";
             --m_SP;
             this->m_PC = this->m_stack[this->m_SP];
         }
@@ -251,6 +254,7 @@ int Chip8::emulate()
             // SYS
 
             _debug("[_] ERR: 0x%X\n", instruction);
+            operation = "ERROR";
             return 1;
             // this->m_PC = nnn;
         }
@@ -259,6 +263,7 @@ int Chip8::emulate()
     case 0x1000:
     { // JMP
         _debug("[_] JMP: 0x%X\n", instruction);
+        operation = "JMP";
         this->m_PC = nnn;
         m_FLAG_JMP = true;
         break;
@@ -266,6 +271,7 @@ int Chip8::emulate()
     case 0x2000:
     { // CALL
         _debug("[_] CALL: 0x%X\n", instruction);
+        operation = "CAL";
         this->m_stack[this->m_SP] = this->m_PC;
         // addres = (instruction & 0x0FFF);
         ++m_SP;
@@ -276,6 +282,7 @@ int Chip8::emulate()
     case 0x3000:
     { // SE SKIP if Vx == byte
         _debug("[_] SE: 0x%X\n", instruction);
+        operation = "SE ";
         if (m_registers[x] == byte)
         {
             // cout << "Skipping\n";
@@ -286,6 +293,7 @@ int Chip8::emulate()
     case 0x4000:
     { // SNE SKIP if Vx != byte
         _debug("[_] SNE: 0x%X\n", instruction);
+        operation = "SNE";
         if (m_registers[x] != byte)
         {
             this->m_PC += 2;
@@ -295,6 +303,7 @@ int Chip8::emulate()
     case 0x5000:
     { // SE  Skip next instruction if Vx = Vy.
         _debug("[_] SE: 0x%X\n", instruction);
+        operation = "SE ";
         if (m_registers[x] == m_registers[y])
         {
             this->m_PC += 2;
@@ -304,12 +313,14 @@ int Chip8::emulate()
     case 0x6000:
     { // LD  Put the value byte into register Vx.
         _debug("[_] LD: 0x%X\n", instruction);
+        operation = "LD ";
         m_registers[x] = byte;
         break;
     }
     case 0x7000:
     { // ADD Adds the value byte to the value of register Vx, then stores the result in Vx.
         _debug("[_] ADD: 0x%X\n", instruction);
+        operation = "ADD";
         m_registers[x] += byte;
         break;
     }
@@ -319,25 +330,30 @@ int Chip8::emulate()
         {
         case 0x0000: // LD Vx, Vy //Stores the value of register Vy in register Vx.
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             m_registers[x] = m_registers[y];
             break;
         case 0x0001: // OR Vx, Vy //Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx
         {
             _debug("[_] OR: 0x%X\n", instruction);
+            operation = "OR ";
             m_registers[x] = m_registers[x] | m_registers[y];
             break;
         }
         case 0x0002: // AND Vx, Vy // Set Vx = Vx AND Vy.
             _debug("[_] AND: 0x%X\n", instruction);
+            operation = "AND";
             m_registers[x] = m_registers[x] & m_registers[y];
             break;
         case 0x0003: // XOR Vx, Vy // Set Vx = Vx XOR Vy.
             _debug("[_] XOR: 0x%X\n", instruction);
+            operation = "XOR";
             m_registers[x] = m_registers[x] ^ m_registers[y];
             break;
         case 0x0004: // ADD Vx, Vy // Set Vx = Vx + Vy, set VF = carry.
         {
             _debug("[_] ADD: 0x%X\n", instruction);
+            operation = "ADD";
             short result = m_registers[x] + m_registers[y];
             if (result > 0xFF)
             {
@@ -354,6 +370,7 @@ int Chip8::emulate()
         }
         case 0x0005: // SUB Vx, Vy // Set Vx = Vx - Vy, set VF = NOT borrow.
             _debug("[_] SUB: 0x%X\n", instruction);
+            operation = "SUB";
             if (m_registers[x] > m_registers[y])
             {
                 m_registers[0xF] = 1;
@@ -366,11 +383,13 @@ int Chip8::emulate()
             break;
         case 0x0006: // SHR Vx {, Vy} // Set Vx = Vx SHR 1.
             _debug("[_] SHR: 0x%X\n", instruction);
+            operation = "SHR";
             m_registers[0xF] = (m_registers[x] & 0x1);
             m_registers[x] >>= 1;
             break;
         case 0x0007: // SUBN Vx, Vy // Set Vx = Vy - Vx, set VF = NOT borrow.
             _debug("[_] SUBN: 0x%X\n", instruction);
+            operation = "SUBN";
             if (m_registers[y] > m_registers[x])
             {
                 m_registers[0xF] = 1;
@@ -383,11 +402,13 @@ int Chip8::emulate()
             break;
         case 0x000E: // SHL Vx {, Vy} // Set Vx = Vx SHL 1.
             _debug("[_] SHL: 0x%X\n", instruction);
+            operation = "SHL";
             m_registers[0xF] = (m_registers[x] & 0x80) >> 7;
             m_registers[x] <<= 1;
             break;
         default:
             _debug("[X] ERR: 0x%X\n", instruction);
+            operation = "ERR";
             return 1;
             break;
         }
@@ -396,6 +417,7 @@ int Chip8::emulate()
     case 0x9000:
     { // SNE Vx, Vy // Skip next instruction if Vx != Vy.
         _debug("[_] SNE: 0x%X\n", instruction);
+        operation = "SNE";
         if (m_registers[x] != m_registers[y])
         {
             this->m_PC += 2;
@@ -405,7 +427,8 @@ int Chip8::emulate()
     case 0xA000:
     {
         _debug("[_] LD: 0x%X\n", instruction);
-        uint16_t address = instruction & 0x0fffu;
+        operation = "LD ";
+        uint16_t address = instruction & 0x0fff;
         m_index = address;
         // return 1;
         // return 1;
@@ -414,12 +437,14 @@ int Chip8::emulate()
     case 0xB000:
     {
         _debug("[_] JP: 0x%X\n", instruction);
+        operation = "JP ";
         this->m_PC = nnn + m_registers[0];
         break;
     }
     case 0xC000:
     {
         _debug("[_] RND: 0x%X\n", instruction);
+        operation = "RND";
         unsigned char r = rand() % 256;
         m_registers[x] = r & byte;
         break;
@@ -427,6 +452,7 @@ int Chip8::emulate()
     case 0xD000:
     {
         _debug("[_] DRW: 0x%X\n", instruction);
+        operation = "DRW";
         unsigned char x_coord = m_registers[x] % 64;
         unsigned char y_coord = m_registers[y] % 32;
         m_registers[0xF] = 0;
@@ -460,20 +486,23 @@ int Chip8::emulate()
         {
         case 0x09E: // SKP Vx
             _debug("[_] SKP: 0x%X\n", instruction);
-            if (this->m_keypad[m_registers[x]])
+            operation = "SKP";
+            if (this->m_keypad[m_registers[x]] )
             {
                 this->m_PC += 2;
             }
             break;
         case 0x0A1:
             _debug("[_] SKNP: 0x%X\n", instruction);
-            if (this->m_keypad[m_registers[x]])
+            operation = "SKNP";
+            if (!this->m_keypad[m_registers[x]] )
             {
                 this->m_PC += 2;
             }
             break;
         default:
             _debug("[X] ERR: 0x%X\n", instruction);
+            operation = "ERR";
             return 1;
             break;
         }
@@ -485,16 +514,18 @@ int Chip8::emulate()
         {
         case 0x0007: // LD Vx, DT
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             m_registers[x] = this->m_delay_timer;
             break;
         case 0x000A: // LD Vx K
         {
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             bool key_flag = false; // Flag for whether a key press was found
 
-            for (int i = 0; i < 16; ++i)
+            for (int i = 0; i < 16; i++)
             {
-                if (this->m_keypad[i] == true)
+                if (this->m_keypad[i])
                 {
                     m_registers[x] = i;
                     key_flag = true;
@@ -510,27 +541,32 @@ int Chip8::emulate()
         }
         case 0x015:
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             this->m_delay_timer = m_registers[x];
             break;
         case 0x018:
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             this->m_sound_timer = m_registers[x];
             break;
         case 0x01E:
         {
             _debug("[_] ADD: 0x%X\n", instruction);
+            operation = "ADD";
             this->m_index += m_registers[x];
             break;
         }
         case 0x029:
         {
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             m_index = 0x50 + (m_registers[x] * 5);
             break;
         }
         case 0x033:
         {
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             auto value = m_registers[x];
 
             m_memory[m_index + 2] = value % 10;
@@ -550,6 +586,7 @@ int Chip8::emulate()
         }
         case 0x055:
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             for (int i = 0; i <= x; ++i)
             {
                 m_memory[m_index + i] = m_registers[i];
@@ -558,6 +595,7 @@ int Chip8::emulate()
             break;
         case 0x065:
             _debug("[_] LD: 0x%X\n", instruction);
+            operation = "LD ";
             for (int i = 0; i <= x; ++i)
             {
                 m_registers[i] = m_memory[this->m_index + i];
@@ -567,7 +605,8 @@ int Chip8::emulate()
             break;
         default:
             // cout << "0xF000 invalid " << hex << instruction << " with opcode " << opcode << endl;
-            _debug("[X] F ERR: 0x%X\n", instruction);
+            _debug("[X] ERR: 0x%X\n", instruction);
+            operation = "ERR";
             return 1;
             break;
         }
@@ -583,6 +622,7 @@ int Chip8::emulate()
         this->m_PC += 2;
     }
 
+    m_last_instruction = operation + " " + instruction_hexstring.str();
     // cout << "OPCODE = " << int(opcode) << " X = " << int(x) << endl;
 
     return 0;

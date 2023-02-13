@@ -13,6 +13,7 @@
 int main(int argv, char **args)
 {
     Application app = Application();
+    app.load(args[1]);
     app.run();
 
     // SDL_Init(SDL_INIT_AUDIO);

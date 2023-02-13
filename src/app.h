@@ -12,12 +12,16 @@ public:
     ~Application();
     int run();
     void stop();
+    bool load(std::string path);
 
 private:
     int m_exit_status{0};
     bool m_running{true};
     bool m_debug{true};
+    bool m_loaded{false};
     void m_handleInput(SDL_Event event);
+    // Deque of instrutions and error codes
+    std::deque<std::string> m_last20Instructions;
     // std::deque<std::string> m_last20Instructions;
     Chip8 m_chip8;
     const SDL_KeyCode m_keys[16] = {
