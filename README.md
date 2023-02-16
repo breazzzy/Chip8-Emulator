@@ -1,4 +1,6 @@
 # Chip8EMU
 ## About
 This is a Chip8 Emulator written in C++ with an Dear IMGui debug GUI allowing users to see realtime internals such as registers and instructions.
-
+![alt text](/.show/IBMTest.png?raw=true)
+## Building & Running
+The project comes with a CMake list configuration, SDL must be installed in order to build from source.
