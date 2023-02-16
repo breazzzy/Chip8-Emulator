@@ -45,12 +45,14 @@ bool Application::load(std::string path){
         std::cout << "---ROM ERROR---" << std::endl;
         m_last20Instructions.push_front("-ROM ERR-");
         m_loaded = false;
+        return false;
     }
     else
     {
         m_last20Instructions.push_front("-ROM LOAD-");
         m_loaded = true;
         std::cout << "---ROM LOADED---" << std::endl;
+        return true;
     }
 }
 
@@ -66,7 +68,7 @@ int Application::run()
 
     // Create window with SDL_Renderer graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window *window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCALE * WINDOW_WIDTH + 100, SCALE * WINDOW_HEIGHT + 120, window_flags);
+    SDL_Window *window = SDL_CreateWindow("Chip8EMU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCALE * WINDOW_WIDTH + 100, SCALE * WINDOW_HEIGHT + 120, window_flags);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
     {

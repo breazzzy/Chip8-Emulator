@@ -1,7 +1,7 @@
 # find_package(glfw3 3.3 REQUIRED)
 # find_package(OpenGL REQUIRED)
 # include_directories( ${OPENGL_INCLUDE_DIRS} )
-project(emu)
+project(Chip8EMU)
 cmake_minimum_required(VERSION 3.2)
 include(FetchContent)
 # add_executable(emu src/main.cpp src/chip8.cpp)
@@ -35,7 +35,7 @@ set(sources
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})   
 
-add_executable(emu src/main.cpp src/chip8.cpp ${sources})
-target_link_libraries(emu ${SDL2_LIBRARIES})
+add_executable(Chip8EMU src/main.cpp src/chip8.cpp ${sources})
+target_link_libraries(Chip8EMU ${SDL2_LIBRARIES})
 
 #target_link_libraries(emu "glad")

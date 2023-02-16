@@ -13,7 +13,11 @@
 int main(int argv, char **args)
 {
     Application app = Application();
-    app.load(args[1]);
+    if(argv > 1){
+        app.load(args[1]);
+    }else{
+        app.load("rom/ibm.ch8");
+    }
     app.run();
 
     // SDL_Init(SDL_INIT_AUDIO);
