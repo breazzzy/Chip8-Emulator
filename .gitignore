@@ -3,3 +3,8 @@
 !/src
 # !/roms
 !CMakeLists.txt
+!/fonts
+!/imgui
+!/rom/ibm.ch8
+!/rom/tetris.ch8
+!/.show
